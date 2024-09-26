@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عرض أول 5 صفحات من PDF</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #pdf-container {
+      width: 80%;
+      margin: 20px auto;
+      border: 1px solid #ddd;
+      overflow: auto;
+      height: 600px;
+    }
+
+    canvas {
+      display: block;
+      margin: 10px auto;
+    }
+
+    .file-list {
+      margin: 20px auto;
+      padding: 0;
+      list-style-type: none;
+    }
+
+    .file-list li {
+      margin: 10px 0;
+    }
+
+    .file-list button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .file-list button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>عرض أول 5 صفحات من ملف PDF</h1>
+
+  <ul class="file-list">
+    <li><button onclick="openFile('https://github.com/ISMAIL-FAWZI/alhawarilaw/raw/43c1b50fca7686932cb7d0ada2e29d029907c29d/pdf_content.pdf')">ملف 1</button></li>
+    <li><button onclick="openFile('https://github.com/ISMAIL-FAWZI/alhawarilaw/raw/43c1b50fca7686932cb7d0ada2e29d029907c29d/pdf_content.pdf')">ملف 2</button></li>
+  </ul>
+
+  <div id="pdf-container"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <script>
+    var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
+    function openFile(url) {
+      var container = document.getElementById('pdf-container');
+      container.innerHTML = ''; // تفريغ المحتوى عند فتح ملف جديد
+
+      pdfjsLib.getDocument(url).promise.then(function(pdfDoc) {
+        var totalPages = pdfDoc.numPages > 5 ? 5 : pdfDoc.numPages; // عرض أول 5 صفحات فقط
+
+        for (var pageNum = 1; pageNum <= totalPages; pageNum++) {
+          pdfDoc.getPage(pageNum).then(function(page) {
+            var viewport = page.getViewport({ scale: 1.5 });
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            container.appendChild(canvas);
+
+            page.render({
+              canvasContext: context,
+              viewport: viewport
+            });
+          });
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
